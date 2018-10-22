@@ -1,0 +1,181 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
+
+/**
+ * This is an   implementation of the mecanum drivetrain
+ *
+ *
+ *
+ */
+@TeleOp(name="Mineral Prototype", group="Iterative Opmode")
+public class VISHYdawgsquad extends OpMode {
+
+    private DcMotor front_left = null;
+    private DcMotor front_right = null;
+    private DcMotor back_left = null;
+    private DcMotor back_right = null;
+    //  private DcMotor hangmotor =null;
+    ColorSensor sensorColor;
+    private CRServo servo1;
+    boolean twisting = false;
+
+
+    @Override
+    public void init() {
+
+        // Name strings must match up with the config on the Robot Controller
+        // app.
+        front_left = hardwareMap.get(DcMotor.class, "motorleft");
+        front_right = hardwareMap.get(DcMotor.class, "motorright");
+        back_left = hardwareMap.get(DcMotor.class, "backmotorleft");
+        back_right = hardwareMap.get(DcMotor.class, "backmotorright");
+        // hangmotor =hardwareMap.get(DcMotor.class, "hangmotor");
+        sensorColor = hardwareMap.get(ColorSensor.class, "colorsensor");
+        servo1 = hardwareMap.get(CRServo.class, "servo1");
+
+        front_left.setDirection(DcMotor.Direction.FORWARD);
+        front_right.setDirection(DcMotor.Direction.FORWARD);
+        back_left.setDirection(DcMotor.Direction.REVERSE);
+        back_right.setDirection(DcMotor.Direction.FORWARD);
+
+
+    }
+
+    @Override
+    public void loop() {
+
+        // Mecanum drive is controlled with three axes: drive (front-and-back),
+        // strafe (left-and-right), and twist (rotating the whole chassis).
+        double drive = -gamepad1.left_stick_y;
+        double strafe = gamepad1.left_stick_x;
+        double twist = gamepad1.right_stick_x;
+
+       /* if (drive != 0)
+        {
+            front_right.setPower(drive);
+            front_left.setPower(drive);
+            back_left.setPower(drive);
+            back_right.setPower(drive);
+        }
+        if (twist != 0)
+        {
+            front_left.setPower(twist * 1);
+            front_right.setPower(-twist);
+            back_right.setPower(-twist);
+            back_left.setPower(twist );
+        }
+        if (strafe != 0)
+        {
+            front_left.setPower(strafe /1);
+            back_right.setPower(strafe /1);
+            front_right.setPower(strafe / -1);
+            back_left.setPower(strafe / -1);
+        }
+        else {
+            front_left.setPower(0);
+            back_right.setPower(0);
+            front_right.setPower(0);
+            back_left.setPower(0);
+        }
+
+        double[] speeds = {
+                (drive + strafe + twist),
+                (drive - strafe - twist),
+                (drive - strafe + twist),
+                (drive + strafe - twist)
+        };
+        double max = Math.abs(speeds[0]);
+        for(int i = 0; i < speeds.length; i++) {
+            if ( max < Math.abs(speeds[i]) ) max = Math.abs(speeds[i]);
+        }
+        if (max > 1) {
+            for (int i = 0; i < speeds.length; i++) speeds[i] /= max;
+        }
+//New commands space.*/
+
+        if (gamepad1.x) {
+            front_left.setPower(.5);
+        } else if (gamepad1.b) {
+            front_left.setPower(-0.5);
+        } else {
+            front_left.setPower(0);
+        }
+
+
+        if (gamepad1.y) {
+            front_right.setPower(.5);
+        } else if (gamepad1.a) {
+            front_right.setPower(-0.5);
+        } else {
+            front_right.setPower(0);
+
+        }
+
+
+        if (gamepad1.right_bumper) {
+            back_left.setPower(.5);
+        } else if (gamepad1.left_bumper) {
+            back_left.setPower(-0.5);
+        } else {
+            back_left.setPower(0);
+
+
+            if (gamepad1.dpad_up) {
+                servo1.setPower(.5);
+            } else if (gamepad1.dpad_down) {
+                servo1.setPower(-.5);
+            } else {
+                servo1.setPower(0);
+            }
+
+
+
+
+            /*
+//if (gamepad2.dpad_up) {
+        //           hangmotor.setPower(0.4);
+//}       else if(gamepad2.dpad_down){
+        //          hangmotor.setPower(-0.4);
+//}else {
+        //          hangmotor.setPower(0);
+//}
+        if (gamepad1.y){
+            telemetry.addData("Red  ", sensorColor.red());
+            telemetry.addData("Green", sensorColor.green());
+            telemetry.addData("Blue ", sensorColor.blue());
+        }
+
+
+        if (gamepad2.right_trigger > 0.01) {
+            servo1.setPower(gamepad2.right_trigger * 1);
+            twisting = true;
+        } else if (gamepad2.left_trigger > 0.01) {
+            servo1.setPower(gamepad2.left_trigger * -1);
+            twisting = true;
+        } else if (twisting) {
+            twisting = false;
+            servo1.getController().pwmDisable();
+        }
+*/
+        }
+
+
+///Cube:
+//red,140,53-
+//blue,46
+//green,87,42
+
+// /ball:
+//red,320,
+// /blue,256
+//green,303, 116
+    }
+}
