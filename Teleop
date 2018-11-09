@@ -1,248 +1,144 @@
 package org.firstinspires.ftc.teamcode;
-
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import com.disnodeteam.dogecv.CameraViewDisplay;
-import com.disnodeteam.dogecv.DogeCV;
-import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
-import com.disnodeteam.dogecv.detectors.roverrukus.SamplingOrderDetector;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRColor;
-
-import java.util.IllegalFormatCodePointException;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
- * Created by aparikh1 on 11/1/2017.
+ * This file provides basic Telop driving for a simple mecanum drive robot.
+ * This OpMode uses the T_DrivetrainOnlyHardware hardware class to define the devices on the robot.
+ * All device access is managed through the T_DrivetrainOnlyHardware class.
+ * This particular OpMode executes a code to run the mecanum wheels to allow for them to work correctly
+ * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-
-@Autonomous(name = "BlueCrater", group = "Linear Opmode")
-public class BlueCrater extends LinearOpMode {
-
-    private DcMotor front_left = null;
-    private DcMotor front_right = null;
-    private DcMotor back_left = null;
-    private DcMotor back_right = null;
-    private ColorSensor sensorColor;
-    private GoldAlignDetector detector;
-    private BNO055IMU imu;
-    private DcMotor hangmotor = null;
-
+@TeleOp(name="Mecanum Wheel Divetrain TeleOp", group="FTCRed")
+public class MecanumDrive extends OpMode {
+    /* Declare OpMode members. */
+ public DcMotor mineralmotorleft= null;
+    public DcMotor mineralmotorright= null;
+public DcMotor hangmotor = null;
+public CRServo servo1 = null;
+ public DcMotor flipmotor = null;
+public ColorSensor colorSensor=null;
+    Hardware robot = new Hardware(); // use the class created to define a robot's hardware
+    /*
+     * Code to run ONCE when the driver hits INIT
+     */
     @Override
-    public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
+    public void init() {
+        /* Initialize the hardware variables.
+         * The init() method of the hardware class does all the work here
+         */
 
 
-        telemetry.update();
-        front_left = hardwareMap.get(DcMotor.class, "motorleft");
-        front_right = hardwareMap.get(DcMotor.class, "motorright");
-        back_left = hardwareMap.get(DcMotor.class, "backmotorleft");
-        back_right = hardwareMap.get(DcMotor.class, "backmotorright");
-        sensorColor = hardwareMap.get(ColorSensor.class, "colorsensor");
-        hangmotor = hardwareMap.get(DcMotor.class, "hangmotor");
+        robot.init(hardwareMap);
+        // Send telemetry message to signify robot waiting;
+        telemetry.addData("Say", "Hello FTC Red Driver");    //
+    mineralmotorleft = hardwareMap.get(DcMotor.class,"mineralmotorleft");
+        mineralmotorright = hardwareMap.get(DcMotor.class,"mineralmotorright");
+hangmotor = hardwareMap.get(DcMotor.class,"hangmotor");
+servo1=hardwareMap.get(CRServo.class,"servo1");
+    flipmotor = hardwareMap.get(DcMotor.class,"flipmotor");
+colorSensor = hardwareMap.get(ColorSensor.class,"colorsensor");
+    }
+    /*
+     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
+     */
+    @Override
+    public void init_loop() {
+    }
+    /*
+     * Code to run ONCE when the driver hits PLAY
+     */
+    @Override
+    public void start() {
+    }
+    /*
+     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
+     */
+    @Override
+    public void loop() {
+        double rightX_G1;
+        double rightY_G1;
+        double leftX_G1;
+        double leftY_G1;
+        double leftX_G2;
+        double leftY_G2;
+        double rightX_G2;
+        double rightY_G2;
+        rightX_G1 = gamepad1.right_stick_x;
+        rightY_G1 = -gamepad1.right_stick_y;
+        leftX_G1 = -gamepad1.left_stick_x;
+        leftY_G1 = -gamepad1.left_stick_y;
+        leftX_G2 = gamepad2.left_stick_x;
+        leftY_G2 = gamepad2.left_stick_y;
+        rightX_G2 = gamepad2.right_stick_x;
+        rightY_G2 = gamepad2.right_stick_y;
 
+        robot.frontLeftMotor.setPower((leftY_G1 + rightX_G1 + leftX_G1)*0.6);
+        robot.rearLeftMotor.setPower((leftY_G1 + rightX_G1 - leftX_G1)*0.6);
+        robot.rearRightMotor.setPower((leftY_G1 - rightX_G1 + leftX_G1)*0.6);
+        robot.frontRightMotor.setPower((leftY_G1 - rightX_G1 - leftX_G1)*0.6);
 
-        front_left.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
-        front_right.setDirection(DcMotor.Direction.FORWARD);
-        back_left.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
-        back_right.setDirection(DcMotor.Direction.FORWARD);
-
-
-        BNO055IMU.Parameters parameters1 = new BNO055IMU.Parameters();
-        parameters1.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters1.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters1.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters1.loggingEnabled = true;
-        parameters1.loggingTag = "IMU";
-        parameters1.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters1);
-
-        detector = new GoldAlignDetector();
-        detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
-        detector.useDefaults();
-        // Optional Tuning
-        detector.alignSize = 180; // How wide (in pixels) is the range in which the gold object will be aligned. (Represented by green bars in the preview)
-        detector.alignPosOffset = -100; // How far from center frame to offset this alignment zone.
-        detector.downscale = 0.4; // How much to downscale the input frames
-        detector.areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA; // Can also be PERFECT_AREA
-        //detector.perfectAreaScorer.perfectArea = 10000; // if using PERFECT_AREA scoring
-        detector.maxAreaScorer.weight = 0.005;
-        detector.ratioScorer.weight = 5;
-        detector.ratioScorer.perfectRatio = 1.0;
-        detector.enable();
-
-
-        waitForStart();
-
-        int firsttime = 1;
-        while (opModeIsActive() && firsttime == 1) {
-
-
-            final double HEADING_EPSILON = 1.5;// Original=1.5
-
-            //  hangmotor.setPower(1);
-            //sleep(3500);
-
-            front_right.setPower(0);
-            front_left.setPower(0);
-            back_left.setPower(0);
-            back_right.setPower(0);
+        if (gamepad2.dpad_up){
+            hangmotor.setPower(-1);
+        }       else if (gamepad2.dpad_down){
+            hangmotor.setPower(1);
+        }else {
             hangmotor.setPower(0);
-            sleep(2000);
-
-
-            if (detector.isFound()) {
-                front_right.setPower(0.4);
-                front_left.setPower(0.4);
-                sleep(1500);
-
-                setDriveSpeed(0, 0, 0, 0);
-                sleep(2000);
-
-                setDriveSpeed(-0.3, -0.3, 0, 0);
-                sleep(1000);
-
-                while (Math.abs(getHeading() - 87) > HEADING_EPSILON) {
-                    setDriveSpeed(-0.375, 0.375, -0.375, 0.375);
-                }
-                setDriveSpeed(0.3, 0.3, 0, 0);
-                sleep(3500);
-
-                while (Math.abs(getHeading() - 130) > HEADING_EPSILON) {
-                    setDriveSpeed(-0.375, 0.375, -0.375, 0.375);
-                }
-
-
-                while (sensorColor.red() > sensorColor.blue()) {
-                    setDriveSpeed(0.375, 0.375, 0, 0);
-                }
-
-
-                setDriveSpeed(-0.6,-0.5,0,0);
-                sleep(6540);
-
-                stop();
-
-            } else {
-                front_right.setPower(0.4);
-                front_left.setPower(0.4);
-                sleep(250);
-                while (Math.abs(getHeading() + 35) > HEADING_EPSILON) {
-                    front_left.setPower(0.35);
-                    front_right.setPower(-0.35);
-                    back_left.setPower(0.35);
-                    back_right.setPower(-0.35);
-                }
-
-                front_right.setPower(0);
-                front_left.setPower(0);
-                back_left.setPower(0);
-                back_right.setPower(0);
-                sleep(1000);
-
-                front_right.setPower(0.3);
-                front_left.setPower(0.3);
-                back_left.setPower(0);
-                back_right.setPower(0);
-                sleep(1000);
-
-
-
-                if (detector.isFound()) {
-                    front_left.setPower(0.3);
-                    front_right.setPower(0.3);
-                    sleep(2000);
-
-                    setDriveSpeed(-0.3, -0.3, 0, 0);
-                    sleep(1500);
-
-                    while (Math.abs(getHeading() - 65) > HEADING_EPSILON) {
-                        setDriveSpeed(-0.4, 0.4, -0.4, 0.4);
-                    }
-                    setDriveSpeed(0.3, 0.3, 0, 0);
-                    sleep(3700);
-
-                    while (Math.abs(getHeading() - 130) > HEADING_EPSILON) {
-                        setDriveSpeed(-0.45, 0.45, -0.45, 0.45);
-                    }
-
-                    while (sensorColor.blue() < sensorColor.red()) {
-                        setDriveSpeed(0.3, 0.3, 0, 0);
-                    }
-
-                    setDriveSpeed(-0.6,-0.5,0,0);
-                    sleep(6540);
-
-                    stop();
-
-                } else {
-                    while (Math.abs(getHeading() + -35) > HEADING_EPSILON) {
-                        setDriveSpeed(-0.425, 0.425, -0.425, 0.425);
-                    }
-                    setDriveSpeed(0.3, 0.3, 0, 0);
-                    sleep(3000);
-
-                    setDriveSpeed(-0.3, -0.3, 0, 0);
-                    sleep(750);
-
-                    while (Math.abs(getHeading() + -80) > HEADING_EPSILON) {
-                        setDriveSpeed(-.4, 0.4, -0.4, 0.4);
-                    }
-                   setDriveSpeed(0.3,0.3,0,0);
-                   sleep(2700);
-
-                   while (Math.abs(getHeading() + -130) > HEADING_EPSILON) {
-                        setDriveSpeed(-0.45, 0.45, -0.45, 0.45);
-                    }
-                    while (sensorColor.blue() < sensorColor.red()) {
-                        setDriveSpeed(0.3, 0.3, 0, 0);
-                    }
-                    setDriveSpeed(-0.5,-0.5,0,0);
-                    sleep(6540);
-
-                    stop();
-
-
-
-                }
-            }
-
-
-
         }
 
-        firsttime = 0;
+        if (gamepad2.a){
+            mineralmotorright.setPower(-1);
+            mineralmotorleft.setPower(1);
+        }else if (gamepad2.y){
+            mineralmotorright.setPower(1);
+            mineralmotorleft.setPower(-1);
+        }else {
+            mineralmotorright.setPower(0);
+            mineralmotorleft.setPower(0);
+        }
+
+        if (gamepad2.right_bumper){
+            servo1.setPower(0.69);
+        } else if (gamepad2.left_bumper){
+            servo1.setPower(-0.69);
+        }else {
+            servo1.setPower(0);
+        }
+
+        if (gamepad2.x){
+            flipmotor.setPower(0.5);
+        }else if (gamepad2.b){
+            flipmotor.setPower(-0.5);
+        }else {
+            flipmotor.setPower(0);
+        }
+
+        if (gamepad1.y){
+            telemetry.addData("Red  ", colorSensor.red());
+            telemetry.addData("Green", colorSensor.green());
+            telemetry.addData("Blue ", colorSensor.blue());
+        }
+
+
+
+
+        /*
+         * Code to run ONCE after the driver hits STOP
+         */
     }
-
-    double getHeading() {
-        return imu.getAngularOrientation().firstAngle;
-    }
-
-    void setDriveSpeed(double left, double right, double bleft, double bright) {
-        front_left.setPower(left);
-//        leftDrive2.setPower(left * 0.9);
-        front_right.setPower(right);
-//        rightDrive2.setPower(right * 0.9);
-        back_left.setPower(bleft);
-
-        back_right.setPower(bright);
-
-    }
-
-
 }
+
+
+
+
+
+
+
+
+
+
 
 
