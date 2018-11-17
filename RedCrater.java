@@ -38,6 +38,8 @@ public class RedCrater extends LinearOpMode {
     private GoldAlignDetector detector;
     private BNO055IMU imu;
     private DcMotor hangmotor = null;
+    private Servo TMServo= null;
+    private DcMotor mineralmotor = null;
 
     @Override
     public void runOpMode() {
@@ -51,7 +53,8 @@ public class RedCrater extends LinearOpMode {
         back_right = hardwareMap.get(DcMotor.class, "backmotorright");
         sensorColor = hardwareMap.get(ColorSensor.class, "colorsensor");
         hangmotor = hardwareMap.get(DcMotor.class, "hangmotor");
-
+        TMServo = hardwareMap.get(Servo.class,"TMServo");
+        mineralmotor = hardwareMap.get(DcMotor.class,"mineralmotorleft");
 
         front_left.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
         front_right.setDirection(DcMotor.Direction.FORWARD);
@@ -92,129 +95,240 @@ public class RedCrater extends LinearOpMode {
 
             final double HEADING_EPSILON = 1.5;// Original=1.5
 
+            hangmotor.setPower(1);
+            sleep(3700);
 
-            if (detector.isFound()) {
+            hangmotor.setPower(0);
+            /* STRAFING */
+            front_left.setPower(0.45);
+            front_right.setPower(-0.45);
+            back_left.setPower(-0.45);
+            back_right.setPower(0.45);
+            sleep(250);
+            /* TURN*/
+            front_left.setPower(0.45);
+            front_right.setPower(-0.45);
+            back_left.setPower(0.45);
+            back_right.setPower(-0.45);
+            sleep(100);
+            /*STRAFFING*/
+            front_left.setPower(0.45);
+            front_right.setPower(-0.45);
+            back_left.setPower(-0.45);
+            back_right.setPower(0.45);
+            sleep(100);
 
-                while (Math.abs(getHeading() + 10) > HEADING_EPSILON) {
-                    setDriveSpeed(0.4, -0.4, 0.4, -0.4);
-                }
+            setDriveSpeed(0,0,0,0);
+            sleep(500);
 
-                setDriveSpeed(0, 0, 0, 0);
-                sleep(1000);
+            setDriveSpeed(0.4, 0.4, 0, 0);
+            sleep(500);
 
-                front_right.setPower(0.4);
-                front_left.setPower(0.4);
-                sleep(1500);
+            while (Math.abs(getHeading() + -16) > HEADING_EPSILON) {
+                setDriveSpeed(-0.4, 0.4, -0.4, 0.4);
+            }
 
-                setDriveSpeed(0, 0, 0, 0);
-                sleep(1000);
+            setDriveSpeed(0,0,0,0);
+            sleep(1000);
 
-                setDriveSpeed(-0.3, -0.3, 0, 0);
-                sleep(500);
+            detector.alignPosOffset=-150;
 
-                while (Math.abs(getHeading() - 87) > HEADING_EPSILON) {
+            setDriveSpeed(0,0,0,0);
+            sleep(1000);
+
+            if (detector.getAligned()){
+
+
+                setDriveSpeed(0.4,0.4,0,0);
+                sleep(1100);
+                setDriveSpeed(-0.4,-0.4,0,0);
+                sleep(400);
+
+                while (Math.abs(getHeading() - 100) > HEADING_EPSILON) {
                     setDriveSpeed(-0.375, 0.375, -0.375, 0.375);
                 }
-                setDriveSpeed(0.3, 0.3, 0, 0);
-                sleep(5500);
 
-                while (Math.abs(getHeading() - 130) > HEADING_EPSILON) {
-                    setDriveSpeed(-0.4, 0.4, -0.4, 0.4);
+                setDriveSpeed(0.4,0.4,0,0);
+                sleep(2650);
+
+                while (Math.abs(getHeading() - 140) > HEADING_EPSILON) {
+                    setDriveSpeed(-0.375, 0.375, -0.375, 0.375);
                 }
 
-
-                while (sensorColor.green()> sensorColor.blue()) {
-                    setDriveSpeed(0.4, 0.4, 0, 0);
+                while (sensorColor.green()>sensorColor.blue()){
+                    setDriveSpeed(0.4,0.4,0,0);
                 }
 
+                setDriveSpeed(0,0,0,0);
+                sleep(500);
+                TMServo.setPosition(0);
 
-                setDriveSpeed(-0.5, -0.6, 0, 0);
-                sleep(6540);
+                setDriveSpeed(0,0,0,0);
+                sleep(500);
+TMServo.setPosition(1);
 
-                stop();
+                setDriveSpeed(-0.4,-0.4,0,0);
+                sleep(2000);
 
-            } else {
-                front_right.setPower(0.4);
-                front_left.setPower(0.4);
-                sleep(250);
-                while (Math.abs(getHeading() + 35) > HEADING_EPSILON) {
-                    front_left.setPower(0.4);
-                    front_right.setPower(-0.4);
-                    back_left.setPower(0.4);
-                    back_right.setPower(-0.4);
-                }
+                setDriveSpeed(0,0,0,0);
+                sleep(500);
 
-                front_right.setPower(0);
-                front_left.setPower(0);
-                back_left.setPower(0);
-                back_right.setPower(0);
+                    setDriveSpeed(-0.5, 0.5, -0.5, 0.5);
+                    sleep(2400);
+
+                setDriveSpeed(0.3,0.3,0,0);
                 sleep(1000);
 
-                front_right.setPower(0.3);
-                front_left.setPower(0.3);
-                back_left.setPower(0);
-                back_right.setPower(0);
-                sleep(700);
+
+                setDriveSpeed(0,0.3,0,0.3);
+                sleep(1000);
+
+            mineralmotor.setPower(-1);
+            sleep(2000);
 
 
-                if (detector.isFound()) {
-                    front_left.setPower(0.3);
-                    front_right.setPower(0.3);
-                    sleep(2250);
+                stop();
+                firsttime=0;
+            }else {
 
-                    setDriveSpeed(-0.3, -0.3, 0, 0);
-                    sleep(1500);
 
-                    while (Math.abs(getHeading() - 80) > HEADING_EPSILON) {
+                while (Math.abs(getHeading()+13) > HEADING_EPSILON) {
+                    setDriveSpeed(0.35, -0.35, 0.35, -0.35);
+                }
+
+                setDriveSpeed(0,0,0,0);
+                sleep(1000);
+
+                if (detector.getAligned())
+                {
+                    setDriveSpeed(0.4,0.4,0,0);
+                    sleep(2000);
+
+
+                    setDriveSpeed(-0.4,-0.4,0,0);
+                    sleep(1000);
+
+
+
+                    while (Math.abs(getHeading() - 90) > HEADING_EPSILON) {
                         setDriveSpeed(-0.4, 0.4, -0.4, 0.4);
                     }
-                    setDriveSpeed(0.3, 0.3, 0, 0);
-                    sleep(4900);
 
-                    while (Math.abs(getHeading() - 130) > HEADING_EPSILON) {
+
+                    setDriveSpeed(0.4,0.4,0,0);
+                    sleep(2700);
+
+                    while (Math.abs(getHeading() - 143) > HEADING_EPSILON) {
                         setDriveSpeed(-0.45, 0.45, -0.45, 0.45);
                     }
 
-                    while (sensorColor.green()> sensorColor.blue()) {
-                        setDriveSpeed(0.3, 0.3, 0, 0);
+                    while (sensorColor.green()>sensorColor.blue()){
+                        setDriveSpeed(0.4,0.4,0,0);
                     }
 
-                    setDriveSpeed(-0.6, -0.5, 0, 0);
-                    sleep(6540);
+                    setDriveSpeed(0,0,0,0);
+                    sleep(500);
+                    TMServo.setPosition(0);
 
-                    stop();
+                    setDriveSpeed(0,0,0,0);
+                    sleep(500);
+                    TMServo.setPosition(1);
 
-                } else {
+                    setDriveSpeed(-0.4,-0.4,0,0);
+                    sleep(2000);
 
-                    setDriveSpeed(-0.3, -0.3, 0, 0);
+                    setDriveSpeed(0,0,0,0);
                     sleep(500);
 
-                    while (Math.abs(getHeading() + -31.5) > HEADING_EPSILON) {
-                        setDriveSpeed(-0.425, 0.425, -0.425, 0.425);
-                    }
-                    setDriveSpeed(0.3, 0.3, 0, 0);
-                    sleep(3000);
+                    setDriveSpeed(-0.5, 0.5, -0.5, 0.5);
+                    sleep(2000);
 
-                    setDriveSpeed(-0.3, -0.3, 0, 0);
-                    sleep(750);
+                    setDriveSpeed(0.3,0.3,0,0);
+                    sleep(1000);
 
-                    while (Math.abs(getHeading() + -80) > HEADING_EPSILON) {
-                        setDriveSpeed(-.4, 0.4, -0.4, 0.4);
-                    }
-                    setDriveSpeed(0.3, 0.3, 0, 0);
-                    sleep(3000);
 
-                    while (Math.abs(getHeading() + -137.5) > HEADING_EPSILON) {
-                        setDriveSpeed(-0.45, 0.45, -0.45, 0.45);
-                    }
-                    while (sensorColor.green()> sensorColor.blue()) {
-                        setDriveSpeed(0.3, 0.3, 0, 0);
-                    }
-                    setDriveSpeed(-0.5, -0.5, 0, 0);
-                    sleep(6540);
+                    setDriveSpeed(0,0.3,0,0.3);
+                    sleep(1000);
+
+                    mineralmotor.setPower(-1);
+                    sleep(2000);
+
 
                     stop();
+                    firsttime=0;
 
+
+
+
+                }else
+
+
+                {
+                    while (Math.abs(getHeading() - 30) > HEADING_EPSILON) {
+                        setDriveSpeed(-0.45, 0.45, -0.45, 0.45);
+                    }
+
+                    setDriveSpeed(0.4, 0.4, 0, 0);
+                    sleep(2000);
+
+
+                    setDriveSpeed(-0.4, -0.4, 0, 0);
+                    sleep(1000);
+
+                    while (Math.abs(getHeading() - 90) > HEADING_EPSILON) {
+                        setDriveSpeed(-0.45, 0.45, -0.45, 0.45);
+                    }
+                    setDriveSpeed(0.4, 0.4, 0, 0);
+                    sleep(2000);
+
+                    while (Math.abs(getHeading() - 154) > HEADING_EPSILON) {
+                        setDriveSpeed(-0.375, 0.375, -0.375, 0.375);
+                    }
+
+                    while (sensorColor.green() > sensorColor.blue()) {
+                        setDriveSpeed(0.4, 0.4, 0, 0);
+                    }
+
+                    setDriveSpeed(0, 0, 0, 0);
+                    sleep(500);
+                    TMServo.setPosition(0);
+
+                    setDriveSpeed(0, 0, 0, 0);
+                    sleep(500);
+
+                    setDriveSpeed(-0.4, -0.4, 0, 0);
+                    sleep(2000);
+
+                    setDriveSpeed(0,0,0,0);
+                    sleep(500);
+                    TMServo.setPosition(0);
+
+                    setDriveSpeed(0,0,0,0);
+                    sleep(500);
+                    TMServo.setPosition(1);
+
+                    setDriveSpeed(-0.4,-0.4,0,0);
+                    sleep(2000);
+
+                    setDriveSpeed(0,0,0,0);
+                    sleep(500);
+
+                    setDriveSpeed(-0.5, 0.5, -0.5, 0.5);
+                    sleep(2000);
+
+                    setDriveSpeed(0.3,0.3,0,0);
+                    sleep(1000);
+
+
+                    setDriveSpeed(0,0.3,0,0.3);
+                    sleep(1000);
+
+                    mineralmotor.setPower(-1);
+                    sleep(2000);
+
+
+                    stop();
+                    firsttime=0;
 
                 }
             }

@@ -35,6 +35,7 @@ public class BlueMarker extends LinearOpMode {
     private GoldAlignDetector detector;
     private BNO055IMU imu;
     private DcMotor hangmotor = null;
+    private Servo TMServo= null;
 
     @Override
     public void runOpMode() {
@@ -48,6 +49,7 @@ public class BlueMarker extends LinearOpMode {
         back_right = hardwareMap.get(DcMotor.class, "backmotorright");
         sensorColor = hardwareMap.get(ColorSensor.class, "colorsensor");
         hangmotor = hardwareMap.get(DcMotor.class, "hangmotor");
+        TMServo = hardwareMap.get(Servo.class,"TMServo");
 
 
         front_left.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
@@ -119,10 +121,14 @@ public class BlueMarker extends LinearOpMode {
             setDriveSpeed(0.4, 0.4, 0, 0);
             sleep(500);
 
+            while (Math.abs(getHeading() + -12) > HEADING_EPSILON) {
+                setDriveSpeed(-0.4, 0.4, -0.4, 0.4);
+            }
+
             setDriveSpeed(0,0,0,0);
             sleep(1000);
 
-            detector.alignPosOffset=-300;
+            detector.alignPosOffset=-150;
 
             setDriveSpeed(0,0,0,0);
             sleep(1000);
@@ -147,10 +153,13 @@ public class BlueMarker extends LinearOpMode {
 
                 }
                 //SERVO TEAM MARKER CODE.
+                TMServo.setPosition(0);
+                setDriveSpeed(0,0,0,0);
+                sleep(1000);
             } else {
 
 
-                while (Math.abs(getHeading() + 25) > HEADING_EPSILON) {
+                while (Math.abs(getHeading() + 17) > HEADING_EPSILON) {
                     setDriveSpeed(0.4, -0.4, 0.4, -0.4);
                 }
 
@@ -170,7 +179,10 @@ public class BlueMarker extends LinearOpMode {
                         setDriveSpeed(0.375, 0.375, 0, 0);
                     }
                     //SERVO TEAM MARKER CODE
+                    TMServo.setPosition(0);
 
+                    setDriveSpeed(0,0,0,0);
+                    sleep(1000);
                 } else {
                     while (Math.abs(getHeading() - 40) > HEADING_EPSILON) {
                         setDriveSpeed(-0.4, 0.4, -0.4, 0.4);
@@ -189,7 +201,9 @@ public class BlueMarker extends LinearOpMode {
                     while (sensorColor.red() > sensorColor.blue()) {
                         setDriveSpeed(0.375, 0.375, 0, 0);
                     }
-
+                    TMServo.setPosition(0);
+                    setDriveSpeed(0,0,0,0);
+                    sleep(1000);
 
                 }
             }

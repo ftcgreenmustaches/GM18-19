@@ -22,6 +22,7 @@ public class FastTele extends OpMode {
     public DcMotor flipmotor = null;
     public ColorSensor colorSensor = null;
     public DcMotor spinner = null;
+    public Servo TMServo=null;
     int lastPos;
 
     Hardware robot = new Hardware(); // use the class created to define a robot's hardware
@@ -44,7 +45,7 @@ public class FastTele extends OpMode {
         flipmotor = hardwareMap.get(DcMotor.class, "flipmotor");
         colorSensor = hardwareMap.get(ColorSensor.class, "colorsensor");
         spinner = hardwareMap.get(DcMotor.class, "spinner");
-
+TMServo= hardwareMap.get(Servo.class,"TMServo");
         flipmotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         flipmotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         flipmotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -118,6 +119,11 @@ public class FastTele extends OpMode {
         } else {
             spinner.setPower(0);
         }
+
+
+if (gamepad1.a){
+            TMServo.setPosition(1);
+}
 
 
 

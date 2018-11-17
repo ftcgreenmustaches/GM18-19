@@ -24,7 +24,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRColor;
 import java.util.IllegalFormatCodePointException;
 
 
-@Autonomous(name = "RedMarker", group = "Linear Opmode")
+@Autonomous(name = "RedMArker", group = "Linear Opmode")
 public class RedMarker extends LinearOpMode {
 
     private DcMotor front_left = null;
@@ -35,6 +35,7 @@ public class RedMarker extends LinearOpMode {
     private GoldAlignDetector detector;
     private BNO055IMU imu;
     private DcMotor hangmotor = null;
+    private Servo TMServo= null;
 
     @Override
     public void runOpMode() {
@@ -48,6 +49,7 @@ public class RedMarker extends LinearOpMode {
         back_right = hardwareMap.get(DcMotor.class, "backmotorright");
         sensorColor = hardwareMap.get(ColorSensor.class, "colorsensor");
         hangmotor = hardwareMap.get(DcMotor.class, "hangmotor");
+        TMServo = hardwareMap.get(Servo.class,"TMServo");
 
 
         front_left.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
@@ -119,10 +121,14 @@ public class RedMarker extends LinearOpMode {
             setDriveSpeed(0.4, 0.4, 0, 0);
             sleep(500);
 
-           setDriveSpeed(0,0,0,0);
-           sleep(1000);
+            while (Math.abs(getHeading() + -12) > HEADING_EPSILON) {
+                setDriveSpeed(-0.4, 0.4, -0.4, 0.4);
+            }
 
-          detector.alignPosOffset=-300;
+            setDriveSpeed(0,0,0,0);
+            sleep(1000);
+
+            detector.alignPosOffset=-150;
 
             setDriveSpeed(0,0,0,0);
             sleep(1000);
@@ -147,6 +153,9 @@ public class RedMarker extends LinearOpMode {
 
                 }
                 //SERVO TEAM MARKER CODE.
+                TMServo.setPosition(0);
+                setDriveSpeed(0,0,0,0);
+                sleep(1000);
             } else {
 
 
@@ -160,7 +169,7 @@ public class RedMarker extends LinearOpMode {
 
                 if (detector.isFound()) {
                     setDriveSpeed(0.4, 0.4, 0, 0);
-                    sleep(2000);
+                    sleep(1750);
 
                     while (Math.abs(getHeading() + -35) > HEADING_EPSILON) {
                         setDriveSpeed(-0.45, 0.45, -0.45, 0.45);
@@ -170,9 +179,12 @@ public class RedMarker extends LinearOpMode {
                         setDriveSpeed(0.375, 0.375, 0, 0);
                     }
                     //SERVO TEAM MARKER CODE
+                    TMServo.setPosition(0);
 
+                    setDriveSpeed(0,0,0,0);
+                    sleep(1000);
                 } else {
-                    while (Math.abs(getHeading() - 36) > HEADING_EPSILON) {
+                    while (Math.abs(getHeading() - 40) > HEADING_EPSILON) {
                         setDriveSpeed(-0.4, 0.4, -0.4, 0.4);
                     }
 
@@ -180,7 +192,7 @@ public class RedMarker extends LinearOpMode {
                     sleep(1000);
 
                     setDriveSpeed(0.4, 0.4, 0, 0);
-                    sleep(1500);
+                    sleep(2000);
 
                     while (Math.abs(getHeading() + 7) > HEADING_EPSILON) {
                         setDriveSpeed(0.45, -0.45, 0.45, -0.45);
@@ -189,12 +201,14 @@ public class RedMarker extends LinearOpMode {
                     while (sensorColor.green() > sensorColor.blue()) {
                         setDriveSpeed(0.375, 0.375, 0, 0);
                     }
-
+                    TMServo.setPosition(0);
+                    setDriveSpeed(0,0,0,0);
+                    sleep(1000);
 
                 }
             }
 
-        stop();
+            stop();
 
         }
 
